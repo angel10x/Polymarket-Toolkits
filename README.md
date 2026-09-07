@@ -39,9 +39,12 @@
 ```bash
 tar -xzf polymarket-toolkits-<tag>-<target>.tar.gz
 cd polymarket-toolkits-<tag>-<target>
-cp config.yaml.example config.yaml
-./polymarket-toolkits run copy-trading    # dry-run: enable_trading is false by default
+
+cp config.yaml.example config.yaml   # credentials; config.json ships with the archive
+./polymarket-toolkits run copy-trading   # dry-run: enable_trading is false by default
 ```
+
+The archive ships `config.json` (public settings) alongside `config.yaml.example` (credentials). Run `./polymarket-toolkits --help` for the full command list, or launch with no subcommand for the interactive TUI.
 
 Prefer to build it? `cargo install --git https://github.com/HarrierOnChain/Prediction-Markets-Trading-Bot-Toolkits`
 

@@ -68,7 +68,7 @@ jobs:
           NAME="${BIN}-${{ github.event.inputs.tag || github.ref_name }}-${{ matrix.target }}"
           mkdir -p "dist/$NAME"
           cp "target/${{ matrix.target }}/release/$BIN" "dist/$NAME/"
-          cp README.md LICENSE config.yaml.example "dist/$NAME/" 2>/dev/null || true
+          cp README.md LICENSE config.json config.yaml.example "dist/$NAME/"
           tar -czf "dist/$NAME.tar.gz" -C dist "$NAME"
           shasum -a 256 "dist/$NAME.tar.gz" | awk '{print $1"  '"$NAME"'.tar.gz"}' > "dist/$NAME.tar.gz.sha256"
 
@@ -80,7 +80,7 @@ jobs:
           NAME="${BIN}-${{ github.event.inputs.tag || github.ref_name }}-${{ matrix.target }}"
           mkdir -p "dist/$NAME"
           cp "target/${{ matrix.target }}/release/$BIN.exe" "dist/$NAME/"
-          cp README.md LICENSE config.yaml.example "dist/$NAME/" 2>/dev/null || true
+          cp README.md LICENSE config.json config.yaml.example "dist/$NAME/"
           (cd dist && 7z a -tzip "$NAME.zip" "$NAME" >/dev/null)
           (cd dist && certutil -hashfile "$NAME.zip" SHA256 | sed -n 2p | tr -d ' \r' | awk '{print $1"  '"$NAME"'.zip"}' > "$NAME.zip.sha256")
 
