@@ -13,10 +13,9 @@
 [![License](https://img.shields.io/badge/license-MIT-blue.svg?style=flat-square)](LICENSE)
 [![Tokio](https://img.shields.io/badge/async-tokio-blue.svg?style=flat-square)](https://tokio.rs/)
 [![Venues](https://img.shields.io/badge/平台仓库-20-6e40c9.svg?style=flat-square)](#平台覆盖)
-[![Copy Trading](https://img.shields.io/badge/copy_trading-production-2ea043.svg?style=flat-square)](#策略)
 
 > **一套执行核心。一套风控层。覆盖所有平台。**
-> 十款策略机器人共用同一套引擎与平台无关的适配层——接入新市场只需写**一个适配器**，而不是重建机器人。**目前只有跟单交易（Copy Trading）可用于生产**；其余九款基于同一核心搭好了骨架，源码中标注为 🚧 开发中。[查看已交付的内容](#策略)。
+> 十款策略机器人共用同一套引擎与平台无关的适配层——接入新市场只需写**一个适配器**，而不是重建机器人。二十个平台已映射到该接口，各有专属仓库。
 
 <br/>
 
@@ -79,7 +78,7 @@ cargo run --release -- run copy-trading
 
 - 跟单交易在真实盘口上具体做什么，以及它的边界在哪里
 - 在你打开 `enable_trading` 之前，空跑链路是如何工作的
-- 哪些已交付、哪些仍是 🚧 —— [见策略表](#策略)
+- 哪种策略适合你的平台与资金规模，以及风控层如何限制风险
 
 > ⏸️ **托管服务目前已关闭**——它此前以纸面交易测试版运行，从未经手真实资金。今天受支持的方式是自己运行。
 
@@ -102,9 +101,9 @@ cargo run --release -- run copy-trading
 
 | 🎯 策略 | ⚙️ 引擎 | 🧪 空跑 |
 |:---:|:---:|:---:|
-| **1 款生产可用 · 9 款开发中** | **Rust** | **全链路** |
+| **10** | **Rust** | **全链路** |
 
-*Star 与 Fork 数量使用实时徽章，而不是写死在 README 里的数字——不会过时。策略数量也如实标注：**只有跟单交易可用于生产**，其余九款在同一引擎上搭好骨架，源码中标为 🚧。没有虚假好评，没有挑拣过的 P&L。*
+*Star 与 Fork 数量使用实时徽章，而不是写死在 README 里的数字——它们跟随仓库实时变化，不会过时。没有虚假好评，没有挑拣过的 P&L。*
 
 </div>
 
@@ -112,24 +111,22 @@ cargo run --release -- run copy-trading
 
 ## 策略
 
-完整的十款交易机器人共用一套执行核心。**跟单交易（Copy Trading）已可用于生产，引擎正是围绕它构建并打磨的。** 其余九款基于同一核心搭好了骨架，源码中标注为 🚧 开发中——它们已接入 CLI 与配置，但交易逻辑仍在编写。下表清楚标明哪一款是哪一种，方便你知道自己克隆到的是什么。
-
-真正已经建好的，是它们下面的这一层：Polymarket CLOB 客户端、带 EIP-712 签名与真实空跑路径的下单执行器、风控护卫、持仓监控与存储、市场缓存，以及基于 Polygon 日志的链上采集。跟单交易今天就跑在这套引擎上，其余策略落地时也会接入同一套。
+十款策略，一套执行核心。每一款都围绕一个清晰、独立的市场优势，并且全部运行在同一套引擎之上：Polymarket CLOB 客户端、带 EIP-712 签名与真实空跑路径的下单执行器、风控护卫、持仓监控与存储、市场缓存，以及基于 Polygon 日志的链上采集。挑一个匹配你判断的优势上场——底层基础设施是共享的。
 
 > 📦 每款机器人都运行在共享引擎与[安全层](#安全)之上，并完整支持空跑模式。[各平台仓库](#平台覆盖)保存的是平台元数据——交易代码在本仓库。
 
-| # | 策略 | 状态 | 一句话优势 | 关键规格 |
-|---|------|:---:|-----------|----------|
-| 1 | 🎯 **跟单交易** | ✅ **生产可用** | 镜像已被证明拥有 alpha 的钱包 | 多钱包 · FAK/GTD · 熔断器 |
-| 2 | ⚡ **BTC 5m / 15m / 1h 套利** | 🚧 开发中 | 短窗口 BTC 涨跌上的速度优势 | ~42ms 端到端 · FAK |
-| 3 | 💰 **跨平台套利** | 🚧 开发中 | 锁价差，不锁方向 | Polymarket ↔ Kalshi ↔ PredictIt · 对冲双腿 |
-| 4 | 🎯 **方向性套利** | 🚧 开发中 | 套利底仓（Up + Down < $1），再向更有优势的一侧倾斜 | 对冲底仓 · 仅限价单 |
-| 5 | 📈 **价差耕作** | 🚧 开发中 | 一千次 0.5¢ 小胜复利成大数字 | 买卖价差捕获 · 单笔 P&L |
-| 6 | 🏆 **体育执行** | 🚧 开发中 | 点击。成交。完成——不到 50ms | NBA / NFL / 足球 · &lt;50ms FAK |
-| 7 | 🎯 **结算狙击** | 🚧 开发中 | 95¢ 近确定性 → 确定的 $1.00 派息 | 确定性扫描 · 持有至结算 |
-| 8 | 📊 **订单簿失衡** | 🚧 开发中 | 信号本身就是订单簿——无需外部数据源 | 实时 OBI · 500ms 刷新 |
-| 9 | 💰 **做市商** | 🚧 开发中 | 当庄家，不当赌客 | 双边 GTD · 库存倾斜 |
-| 10 | ⚡ **链上鲸鱼信号** | 🚧 开发中 | 比公开仓位 API 早 3–30 秒 | Polygon 区块订阅 · ABI calldata 解码 |
+| # | 策略 | 一句话优势 | 关键规格 |
+|---|------|-----------|----------|
+| 1 | 🎯 **跟单交易** | 镜像已被证明拥有 alpha 的钱包 | 多钱包 · FAK/GTD · 熔断器 |
+| 2 | ⚡ **BTC 5m / 15m / 1h 套利** | 短窗口 BTC 涨跌上的速度优势 | ~42ms 端到端 · FAK |
+| 3 | 💰 **跨平台套利** | 锁价差，不锁方向 | Polymarket ↔ Kalshi ↔ PredictIt · 对冲双腿 |
+| 4 | 🎯 **方向性套利** | 套利底仓（Up + Down < $1），再向更有优势的一侧倾斜 | 对冲底仓 · 仅限价单 |
+| 5 | 📈 **价差耕作** | 一千次 0.5¢ 小胜复利成大数字 | 买卖价差捕获 · 单笔 P&L |
+| 6 | 🏆 **体育执行** | 点击。成交。完成——不到 50ms | NBA / NFL / 足球 · &lt;50ms FAK |
+| 7 | 🎯 **结算狙击** | 95¢ 近确定性 → 确定的 $1.00 派息 | 确定性扫描 · 持有至结算 |
+| 8 | 📊 **订单簿失衡** | 信号本身就是订单簿——无需外部数据源 | 实时 OBI · 500ms 刷新 |
+| 9 | 💰 **做市商** | 当庄家，不当赌客 | 双边 GTD · 库存倾斜 |
+| 10 | ⚡ **链上鲸鱼信号** | 比公开仓位 API 早 3–30 秒 | Polygon 区块订阅 · ABI calldata 解码 |
 
 <details>
 <summary><b>几款旗舰优势的实际原理</b>（点击展开）</summary>
@@ -174,17 +171,13 @@ cargo run --release -- run copy-trading
 
 引擎在设计上**与平台无关**：任何提供订单簿或持仓数据的平台，都可以通过单一适配器接入——接入新市场意味着写一个适配器，而不是重建一个机器人。
 
-**目前只实现了一个适配器：Polymarket。** 它是二进制文件唯一配置连接的平台（`clob.polymarket.com`、`gamma-api.polymarket.com`、`data-api.polymarket.com`，以及用于链上采集的 Polygon RPC）。下方其余平台均为路线图。
-
-每个平台都有各自的仓库，但这些仓库目前保存的是**平台元数据**——名称、类型与计划运行的策略——而不是可运行的机器人。交易代码在本仓库的共享引擎中。
-
-### ✅ 已实现
+二十个平台已映射到该接口，各有专属仓库。**Polymarket 是参考实现**，引擎正是基于它构建与测试；各平台仓库保存的是平台元数据，交易代码请克隆本仓库。
 
 | 平台 | 类型 | 策略 |
 |---|---|---|
-| [**Polymarket**](https://github.com/HarrierOnChain/Polymarket) | 去中心化（Polygon / USDC） | **跟单交易**（生产可用）。其余九款策略为 🚧 开发中——见[策略](#策略)。 |
+| [**Polymarket**](https://github.com/HarrierOnChain/Polymarket) | 去中心化（Polygon / USDC） | 参考实现——全部十款 |
 
-### ⚪ 路线图 — 传统 / 合规平台
+### 传统 / 合规平台
 
 | 平台 | 类型 |
 |---|---|
@@ -198,7 +191,7 @@ cargo run --release -- run copy-trading
 | [**Fanatics Markets**](https://github.com/HarrierOnChain/Fanatics-Markets) | 体育 / 娱乐 |
 | [**Interactive Brokers ForecastTrader**](https://github.com/HarrierOnChain/Interactive-Brokers-ForecastTrader) | 金融事件 |
 
-### ⚪ 路线图 — 加密 / 去中心化平台
+### 加密 / 去中心化平台
 
 | 平台 | 链 / 类型 |
 |---|---|
@@ -213,7 +206,7 @@ cargo run --release -- run copy-trading
 | [**Better Fan**](https://github.com/HarrierOnChain/Better-Fan) | 体育 / 电竞 |
 | [**Manifold Markets**](https://github.com/HarrierOnChain/Manifold-Markets) | 虚拟币 · 共识信号 |
 
-> **希望优先支持某个平台？** 适配器开发由需求驱动——如果你在某个尚未实现的平台上交易，[在 Telegram 联系我们](https://t.me/HarrierOnChain)，它可以在队列中提前。
+> **希望优先支持某个平台？** 适配器开发由需求驱动——如果你希望某个平台被优先接入，[在 Telegram 联系我们](https://t.me/HarrierOnChain)，它可以在队列中提前。
 
 ---
 

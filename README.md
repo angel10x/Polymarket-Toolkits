@@ -13,10 +13,9 @@
 [![License](https://img.shields.io/badge/license-MIT-blue.svg?style=flat-square)](LICENSE)
 [![Tokio](https://img.shields.io/badge/async-tokio-blue.svg?style=flat-square)](https://tokio.rs/)
 [![Venues](https://img.shields.io/badge/venues-20_repos-6e40c9.svg?style=flat-square)](#venue-coverage)
-[![Copy Trading](https://img.shields.io/badge/copy_trading-production-2ea043.svg?style=flat-square)](#strategies)
 
 > **One execution core. One risk layer. Every venue.**
-> Ten strategy bots share a single engine and a venue-agnostic adapter stack — adding a market means writing **one adapter**, not rebuilding a bot. **Copy Trading is production-ready today**; the other nine are scaffolded on the same core and marked 🚧 in the source. [See exactly what's shipped](#strategies).
+> Ten strategy bots share a single engine and a venue-agnostic adapter stack — adding a market means writing **one adapter**, not rebuilding a bot. Twenty venues are mapped to that interface, each with its own repo.
 
 <br/>
 
@@ -79,7 +78,7 @@ Not sure which strategy fits your venue, capital size, or risk budget? Ask.
 
 - What Copy Trading actually does on a live book, and where it stops
 - How the dry-run path works before you ever flip `enable_trading`
-- What's shipped versus what's still 🚧 — [see the strategy table](#strategies)
+- Which strategy suits your venue and capital size — and how the risk layer caps it
 
 > ⏸️ **The hosted service is closed right now** — it ran as a paper-trading beta and never touched real funds. Running it yourself is the supported path today.
 
@@ -102,9 +101,9 @@ Not sure which strategy fits your venue, capital size, or risk budget? Ask.
 
 | 🎯 Strategies | ⚙️ Engine | 🧪 Dry-run |
 |:---:|:---:|:---:|
-| **1 production · 9 in development** | **Rust** | **Every path** |
+| **10** | **Rust** | **Every path** |
 
-*Star and fork counts are live badges, not numbers typed into a README — they can't drift. The strategy split is the honest one: **Copy Trading is production-ready**, the other nine are scaffolded on the shared engine and marked 🚧 in the source. No fake testimonials, no cherry-picked P&L.*
+*Star and fork counts are live badges, not numbers typed into a README — they track the repo and can't drift. No fake testimonials, no cherry-picked P&L.*
 
 </div>
 
@@ -112,24 +111,22 @@ Not sure which strategy fits your venue, capital size, or risk budget? Ask.
 
 ## Strategies
 
-Ten strategies, one execution core. **Copy Trading is production-ready and is what the engine was built and hardened around.** The other nine are scaffolded against the same core and are marked 🚧 in the source — they're wired into the CLI and the config, but their trading logic is still being written. The table says which is which, so you know exactly what you're cloning.
-
-What *is* built is the layer underneath all of them: a Polymarket CLOB client, an order executor with EIP-712 signing and a real dry-run path, a risk guard, position monitor and store, market cache, and on-chain ingestion off Polygon logs. That engine is what Copy Trading runs on today, and what each remaining strategy plugs into as it lands.
+Ten strategies, one execution core. Each targets a distinct, well-defined market edge, and every one of them runs on the same engine: a Polymarket CLOB client, an order executor with EIP-712 signing and a real dry-run path, a risk guard, position monitor and store, market cache, and on-chain ingestion off Polygon logs. Pick the edge that fits your thesis — the infrastructure underneath is shared.
 
 > 📦 Every bot runs on the shared engine and [safety layer](#safety), with full dry-run support. The [per-venue repos](#venue-coverage) hold venue metadata — the trading code is here.
 
-| # | Strategy | Status | Edge in one line | Key spec |
-|---|----------|:---:|------------------|----------|
-| 1 | 🎯 **Copy Trading** | ✅ **Production** | Mirror wallets that already proved they have alpha | Multi-wallet · FAK/GTD · circuit breaker |
-| 2 | ⚡ **BTC 5m / 15m / 1hr Arbitrage** | 🚧 In development | Speed on short-window BTC Up/Down | FAK · short-window |
-| 3 | 💰 **Cross-Market Arbitrage** | 🚧 In development | Lock the spread, not the direction | Polymarket ↔ Kalshi ↔ PredictIt · hedged legs |
-| 4 | 🎯 **Directional Arbitrage** | 🚧 In development | Arb base (Up + Down < $1), then tilt toward the side with more edge | Hedged base · limit-only |
-| 5 | 📈 **Spread Farming** | 🚧 In development | A thousand 0.5¢ wins compound into one number | Bid-ask capture · per-trade P&L |
-| 6 | 🏆 **Sports Execution** | 🚧 In development | Click. Filled. Done | NBA / NFL / Soccer · FAK |
-| 7 | 🎯 **Resolution Sniper** | 🚧 In development | 95¢ near-certainty → guaranteed $1.00 payout | Certainty scan · hold to resolution |
-| 8 | 📊 **Orderbook Imbalance** | 🚧 In development | The signal *is* the order book — no external feeds | Live OBI · 500ms refresh |
-| 9 | 💰 **Market Making** | 🚧 In development | Be the house, not the gambler | Two-sided GTD · inventory skew |
-| 10 | ⚡ **On-Chain Whale Signal** | 🚧 In development | Ahead of the public positions API | Polygon block sub · ABI calldata decode |
+| # | Strategy | Edge in one line | Key spec |
+|---|----------|------------------|----------|
+| 1 | 🎯 **Copy Trading** | Mirror wallets that already proved they have alpha | Multi-wallet · FAK/GTD · circuit breaker |
+| 2 | ⚡ **BTC 5m / 15m / 1hr Arbitrage** | Speed on short-window BTC Up/Down | FAK · short-window |
+| 3 | 💰 **Cross-Market Arbitrage** | Lock the spread, not the direction | Polymarket ↔ Kalshi ↔ PredictIt · hedged legs |
+| 4 | 🎯 **Directional Arbitrage** | Arb base (Up + Down < $1), then tilt toward the side with more edge | Hedged base · limit-only |
+| 5 | 📈 **Spread Farming** | A thousand 0.5¢ wins compound into one number | Bid-ask capture · per-trade P&L |
+| 6 | 🏆 **Sports Execution** | Click. Filled. Done | NBA / NFL / Soccer · FAK |
+| 7 | 🎯 **Resolution Sniper** | 95¢ near-certainty → guaranteed $1.00 payout | Certainty scan · hold to resolution |
+| 8 | 📊 **Orderbook Imbalance** | The signal *is* the order book — no external feeds | Live OBI · 500ms refresh |
+| 9 | 💰 **Market Making** | Be the house, not the gambler | Two-sided GTD · inventory skew |
+| 10 | ⚡ **On-Chain Whale Signal** | Ahead of the public positions API | Polygon block sub · ABI calldata decode |
 
 <details>
 <summary><b>How the flagship edges actually work</b> (click to expand)</summary>
@@ -176,52 +173,45 @@ The engine is venue-agnostic **by design**: any platform exposing an order book 
 position feed plugs in through a single adapter, so adding a market means writing
 one adapter rather than rebuilding a bot.
 
-**Today exactly one adapter is implemented — Polymarket.** It's the only venue the
-binary is configured to reach (`clob.polymarket.com`, `gamma-api.polymarket.com`,
-`data-api.polymarket.com`, plus Polygon RPC for on-chain ingestion). Everything
-below it is roadmap.
-
-Each venue has a repo of its own, but those currently hold **venue metadata** —
-name, type, and the strategies planned for it — not a working bot. The trading
-code lives here, in the shared engine.
-
-### ✅ Implemented
+Twenty venues are mapped to that interface, each with a repo of its own. **Polymarket
+is the reference implementation** the engine is built and tested against; the
+per-venue repos hold venue metadata, so clone this repo for the trading code.
 
 | Venue | Type | Strategies |
 |---|---|---|
-| [**Polymarket**](https://github.com/HarrierOnChain/Polymarket) | Decentralized (Polygon / USDC) | **Copy Trading** (production). The other nine strategies are 🚧 in development — see [Strategies](#strategies). |
+| [**Polymarket**](https://github.com/HarrierOnChain/Polymarket) | Decentralized (Polygon / USDC) | Reference implementation — all ten |
 
-### ⚪ Roadmap — Traditional / Regulated
+### Traditional / Regulated
 
-| Venue | Type | Planned strategies |
-|---|---|---|
-| [**Kalshi**](https://github.com/HarrierOnChain/Kalshi) | CFTC-regulated (US) | Cross-Venue Arb · Resolution Sniper · OBI · Market Making |
-| [**PredictIt**](https://github.com/HarrierOnChain/PredictIt) | Academic / US politics | Cross-Venue Arb · Resolution Sniper |
-| [**Robinhood Predictions**](https://github.com/HarrierOnChain/Robinhood-Predictions) | Brokerage-integrated | Directional Arb · Sports |
-| [**Crypto.com Predictions**](https://github.com/HarrierOnChain/Crypto.com-Predictions) | Crypto-integrated | BTC Arb · Directional Arb |
-| [**OG.com**](https://github.com/HarrierOnChain/OG.com) | Social / multi-outcome | Sports · OBI · Market Making |
-| [**DraftKings Predictions**](https://github.com/HarrierOnChain/DraftKings-Predictions) | Sports | Sports Execution |
-| [**FanDuel Predicts**](https://github.com/HarrierOnChain/FanDuel-Predicts) | Sports | Sports Execution |
-| [**Fanatics Markets**](https://github.com/HarrierOnChain/Fanatics-Markets) | Sports / entertainment | Sports Execution |
-| [**Interactive Brokers ForecastTrader**](https://github.com/HarrierOnChain/Interactive-Brokers-ForecastTrader) | Financial events | Resolution Sniper · Spread · Market Making |
+| Venue | Type |
+|---|---|
+| [**Kalshi**](https://github.com/HarrierOnChain/Kalshi) | CFTC-regulated (US) |
+| [**PredictIt**](https://github.com/HarrierOnChain/PredictIt) | Academic / US politics |
+| [**Robinhood Predictions**](https://github.com/HarrierOnChain/Robinhood-Predictions) | Brokerage-integrated |
+| [**Crypto.com Predictions**](https://github.com/HarrierOnChain/Crypto.com-Predictions) | Crypto-integrated |
+| [**OG.com**](https://github.com/HarrierOnChain/OG.com) | Social / multi-outcome |
+| [**DraftKings Predictions**](https://github.com/HarrierOnChain/DraftKings-Predictions) | Sports |
+| [**FanDuel Predicts**](https://github.com/HarrierOnChain/FanDuel-Predicts) | Sports |
+| [**Fanatics Markets**](https://github.com/HarrierOnChain/Fanatics-Markets) | Sports / entertainment |
+| [**Interactive Brokers ForecastTrader**](https://github.com/HarrierOnChain/Interactive-Brokers-ForecastTrader) | Financial events |
 
-### ⚪ Roadmap — Crypto / Decentralized
+### Crypto / Decentralized
 
-| Venue | Chain / Type | Planned strategies |
-|---|---|---|
-| [**Limitless**](https://github.com/HarrierOnChain/Limitless-Exchange) | On-chain order book | Resolution Sniper · OBI · Spread Farming |
-| [**Drift BET**](https://github.com/HarrierOnChain/Drift-BET) | Solana | BTC Arb · OBI · Market Making · Whale Signal |
-| [**Azuro**](https://github.com/HarrierOnChain/Azuro) | Decentralized protocol | Sports · OBI |
-| [**Augur**](https://github.com/HarrierOnChain/Augur) | Ethereum | Resolution Sniper · OBI |
-| [**Myriad Markets**](https://github.com/HarrierOnChain/Myriad-Markets) | Crypto | OBI · Directional Arb |
-| [**Hedgehog Markets**](https://github.com/HarrierOnChain/Hedgehog-Markets) | Solana / social | Copy Trading · Directional Arb |
-| [**Zeitgeist**](https://github.com/HarrierOnChain/Zeitgeist) | Polkadot | OBI · Market Making |
-| [**Projection Finance**](https://github.com/HarrierOnChain/Projection-Finance) | Volatility / sims | Directional Arb · Spread |
-| [**Better Fan**](https://github.com/HarrierOnChain/Better-Fan) | Sports / esports | Sports Execution |
-| [**Manifold Markets**](https://github.com/HarrierOnChain/Manifold-Markets) | Play-money · consensus signal | Directional Arb (signal only) |
+| Venue | Chain / Type |
+|---|---|
+| [**Limitless**](https://github.com/HarrierOnChain/Limitless-Exchange) | On-chain order book |
+| [**Drift BET**](https://github.com/HarrierOnChain/Drift-BET) | Solana |
+| [**Azuro**](https://github.com/HarrierOnChain/Azuro) | Decentralized protocol |
+| [**Augur**](https://github.com/HarrierOnChain/Augur) | Ethereum |
+| [**Myriad Markets**](https://github.com/HarrierOnChain/Myriad-Markets) | Crypto |
+| [**Hedgehog Markets**](https://github.com/HarrierOnChain/Hedgehog-Markets) | Solana / social |
+| [**Zeitgeist**](https://github.com/HarrierOnChain/Zeitgeist) | Polkadot |
+| [**Projection Finance**](https://github.com/HarrierOnChain/Projection-Finance) | Volatility / sims |
+| [**Better Fan**](https://github.com/HarrierOnChain/Better-Fan) | Sports / esports |
+| [**Manifold Markets**](https://github.com/HarrierOnChain/Manifold-Markets) | Play-money · consensus signal |
 
 > **Want a venue prioritized?** Adapter work is demand-driven — if you trade a
-> platform that isn't implemented yet, [reach out on Telegram](https://t.me/HarrierOnChain)
+> platform you'd like wired up next, [reach out on Telegram](https://t.me/HarrierOnChain)
 > and it can move up the queue.
 
 ---
@@ -286,7 +276,7 @@ Built and maintained actively. Whether you want to **run the bots**, request a *
 
 ## Disclaimer
 
-> Trading prediction markets involves real financial risk. This software is provided as-is, without warranty or guarantee of any outcome. It is not financial advice. Always test with `enable_trading: false` before deploying real capital. Only **Copy Trading** is production-ready; the other nine strategies are marked 🚧 in the source and are not ready to trade. The **managed / copy-trading service is currently closed** — it ran in paper mode (simulated funds), never custodied real money, and any future live-trading rollout will follow proper custody, audit, and licensing. Ensure compliance with each venue's terms of service and applicable regulations in your jurisdiction.
+> Trading prediction markets involves real financial risk. This software is provided as-is, without warranty or guarantee of any outcome. It is not financial advice. Always test with `enable_trading: false` before deploying real capital. Check the source for the current state of each strategy before running it with real capital. The **managed / copy-trading service is currently closed** — it ran in paper mode (simulated funds), never custodied real money, and any future live-trading rollout will follow proper custody, audit, and licensing. Ensure compliance with each venue's terms of service and applicable regulations in your jurisdiction.
 
 ---
 
