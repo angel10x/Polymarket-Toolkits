@@ -11,5 +11,5 @@ config.yaml
 
 .env
 
-# lockfile intentionally untracked (CI builds non-locked)
-Cargo.lock
+# Cargo.lock IS tracked: this is a binary crate, so the lockfile is what makes
+# release builds and `cargo build --locked` reproducible across machines and CI.

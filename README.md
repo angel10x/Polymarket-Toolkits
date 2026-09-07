@@ -12,12 +12,11 @@
 [![Stars](https://img.shields.io/github/stars/HarrierOnChain/Prediction-Markets-Trading-Bot-Toolkits?style=flat-square&color=6e40c9)](https://github.com/HarrierOnChain/Prediction-Markets-Trading-Bot-Toolkits/stargazers)
 [![License](https://img.shields.io/badge/license-MIT-blue.svg?style=flat-square)](LICENSE)
 [![Tokio](https://img.shields.io/badge/async-tokio-blue.svg?style=flat-square)](https://tokio.rs/)
-[![Live venues](https://img.shields.io/badge/live-7_venues-6e40c9.svg?style=flat-square)](#venue-coverage)
-[![Beta venues](https://img.shields.io/badge/beta-2_venues-f5a623.svg?style=flat-square)](#venue-coverage)
-[![Roadmap](https://img.shields.io/badge/roadmap-25+_venues-555.svg?style=flat-square)](#venue-coverage)
+[![Venues](https://img.shields.io/badge/venues-20_repos-6e40c9.svg?style=flat-square)](#venue-coverage)
+[![Copy Trading](https://img.shields.io/badge/copy_trading-production-2ea043.svg?style=flat-square)](#strategies)
 
 > **One execution core. One risk layer. Every venue.**
-> Ten strategy bots run on a single battle-tested engine and a venue-agnostic adapter stack. Adding a market means writing **one adapter** — not rebuilding a bot. Seven venues are live in production today, two more are in beta with live market data, and the rest of the prediction-market universe is adapter-driven roadmap.
+> Ten strategy bots share a single engine and a venue-agnostic adapter stack — adding a market means writing **one adapter**, not rebuilding a bot. **Copy Trading is production-ready today**; the other nine are scaffolded on the same core and marked 🚧 in the source. [See exactly what's shipped](#strategies).
 
 <br/>
 
@@ -25,7 +24,7 @@
 &nbsp;
 [![PnL Profit — live](https://img.shields.io/badge/🚀_PnL_Profit-Live_at_pnlpro.fit-16a34a?style=for-the-badge)](https://pnlpro.fit)
 
-**[Quick Start](#-quick-start) • [Strategies](#strategies) • [Managed Service](#-managed--copy-trading--early-access) • [Venue Coverage](#venue-coverage) • [Engine](#engine) • [Safety](#safety) • [Contact](#contact)**
+**[Quick Start](#-quick-start) • [Strategies](#strategies) • [Managed Service](#-managed--copy-trading--currently-closed) • [Venue Coverage](#venue-coverage) • [Engine](#engine) • [Safety](#safety) • [Contact](#contact)**
 
 **🌐 Language / 语言 / Язык:** [English](#prediction-market-toolkits) • [简体中文](README.zh-CN.md) • [Русский](README.ru.md)
 
@@ -35,7 +34,16 @@
 
 ## 🚀 Quick Start
 
-Two ways to trade with the toolkit — **run it yourself**, or **let us run it for you**.
+**No Rust toolchain needed.** Grab a prebuilt binary from the [latest release](https://github.com/HarrierOnChain/Prediction-Markets-Trading-Bot-Toolkits/releases/latest) — Linux (x86_64 / aarch64), macOS (Intel / Apple Silicon), Windows — verify the SHA256, and you're running in about a minute:
+
+```bash
+tar -xzf polymarket-toolkits-<tag>-<target>.tar.gz
+cd polymarket-toolkits-<tag>-<target>
+cp config.yaml.example config.yaml
+./polymarket-toolkits run copy-trading    # dry-run: enable_trading is false by default
+```
+
+Prefer to build it? `cargo install --git https://github.com/HarrierOnChain/Prediction-Markets-Trading-Bot-Toolkits`
 
 <table>
 <tr>
@@ -62,17 +70,17 @@ Every bot ships with `enable_trading: false` by default — the full execution p
 </td>
 <td width="50%" valign="top">
 
-### 💼 Let us run them for you
+### 💬 Talk it through first
 
-Managed accounts + copy-trading, hosted. No setup, no keys to manage.
+Not sure which strategy fits your venue, capital size, or risk budget? Ask.
 
-- Pick a **proven leader** from the on-chain leaderboard, or a strategy
-- We run the bots; you keep an eye on the dashboard
-- Tiered subscription + performance fee — [see plans](#-managed--copy-trading--early-access)
+- What Copy Trading actually does on a live book, and where it stops
+- How the dry-run path works before you ever flip `enable_trading`
+- What's shipped versus what's still 🚧 — [see the strategy table](#strategies)
 
-> 🧪 **In early-access beta (paper trading).** Simulated funds today; managed live trading is rolling out to the waitlist.
+> ⏸️ **The hosted service is closed right now** — it ran as a paper-trading beta and never touched real funds. Running it yourself is the supported path today.
 
-**[→ Join the early-access waitlist on Telegram](https://t.me/HarrierOnChain)**
+**[→ Message on Telegram](https://t.me/HarrierOnChain)**
 
 </td>
 </tr>
@@ -84,11 +92,16 @@ Managed accounts + copy-trading, hosted. No setup, no keys to manage.
 
 <div align="center">
 
-| ⭐ Stars | 🍴 Forks | 🟢 Live venues | 🎯 Strategies | ⚙️ Engine | 🧪 Dry-run |
-|:---:|:---:|:---:|:---:|:---:|:---:|
-| **359+** | **239+** | **7** (+2 beta) | **10** | **Rust · <1ms/event** | **Every path** |
+[![Stars](https://img.shields.io/github/stars/HarrierOnChain/Prediction-Markets-Trading-Bot-Toolkits?style=for-the-badge&logo=github&label=Stars&color=1f6feb)](https://github.com/HarrierOnChain/Prediction-Markets-Trading-Bot-Toolkits/stargazers)
+[![Forks](https://img.shields.io/github/forks/HarrierOnChain/Prediction-Markets-Trading-Bot-Toolkits?style=for-the-badge&logo=github&label=Forks&color=1f6feb)](https://github.com/HarrierOnChain/Prediction-Markets-Trading-Bot-Toolkits/forks)
+[![CI](https://img.shields.io/github/actions/workflow/status/HarrierOnChain/Prediction-Markets-Trading-Bot-Toolkits/rust.yml?style=for-the-badge&logo=githubactions&logoColor=white&label=Build)](https://github.com/HarrierOnChain/Prediction-Markets-Trading-Bot-Toolkits/actions/workflows/rust.yml)
+[![License](https://img.shields.io/github/license/HarrierOnChain/Prediction-Markets-Trading-Bot-Toolkits?style=for-the-badge&color=1f6feb)](LICENSE)
 
-*Real, honest signals only — [GitHub stars](https://github.com/HarrierOnChain/Prediction-Markets-Trading-Bot-Toolkits/stargazers), CI status, and venue counts you can verify above. No fake testimonials, no cherry-picked P&L.*
+| 🎯 Strategies | ⚙️ Engine | 🧪 Dry-run |
+|:---:|:---:|:---:|
+| **1 production · 9 in development** | **Rust** | **Every path** |
+
+*Star and fork counts are live badges, not numbers typed into a README — they can't drift. The strategy split is the honest one: **Copy Trading is production-ready**, the other nine are scaffolded on the shared engine and marked 🚧 in the source. No fake testimonials, no cherry-picked P&L.*
 
 </div>
 
@@ -96,29 +109,31 @@ Managed accounts + copy-trading, hosted. No setup, no keys to manage.
 
 ## Strategies
 
-A complete suite of ten production-grade trading bots, each engineered around a distinct, well-defined market edge. Every strategy runs on the same battle-tested execution core, risk layer, and venue-agnostic adapter stack — so you get consistent performance, unified risk controls, and a single operational surface across every play in the book. Pick the edge that fits your thesis; the infrastructure is already built.
+Ten strategies, one execution core. **Copy Trading is production-ready and is what the engine was built and hardened around.** The other nine are scaffolded against the same core and are marked 🚧 in the source — they're wired into the CLI and the config, but their trading logic is still being written. The table says which is which, so you know exactly what you're cloning.
 
-> 📦 **Full walkthroughs, screenshots, and per-venue configs live in each market's dedicated repo** — see [Venue Coverage](#venue-coverage) for the directory. The table below is the strategy index; every bot runs on the shared engine and [safety layer](#safety), with full dry-run support.
+What *is* built is the layer underneath all of them: a Polymarket CLOB client, an order executor with EIP-712 signing and a real dry-run path, a risk guard, position monitor and store, market cache, and on-chain ingestion off Polygon logs. That engine is what Copy Trading runs on today, and what each remaining strategy plugs into as it lands.
 
-| # | Strategy | Edge in one line | Key spec |
-|---|----------|------------------|----------|
-| 1 | 🎯 **Copy Trading** | Mirror wallets that already proved they have alpha | Multi-wallet · FAK/GTD · circuit breaker |
-| 2 | ⚡ **BTC 5m / 15m / 1hr Arbitrage** | Speed on short-window BTC Up/Down | ~42ms end-to-end · FAK |
-| 3 | 💰 **Cross-Market Arbitrage** | Lock the spread, not the direction | Polymarket ↔ Kalshi ↔ PredictIt · hedged legs |
-| 4 | 🎯 **Directional Arbitrage** | Arb base (Up + Down < $1), then tilt toward the side with more edge | Hedged base · limit-only |
-| 5 | 📈 **Spread Farming** | A thousand 0.5¢ wins compound into one number | Bid-ask capture · per-trade P&L |
-| 6 | 🏆 **Sports Execution** | Click. Filled. Done — under 50ms | NBA / NFL / Soccer · &lt;50ms FAK |
-| 7 | 🎯 **Resolution Sniper** | 95¢ near-certainty → guaranteed $1.00 payout | Certainty scan · hold to resolution |
-| 8 | 📊 **Orderbook Imbalance** | The signal *is* the order book — no external feeds | Live OBI · 500ms refresh |
-| 9 | 💰 **Market Making** | Be the house, not the gambler | Two-sided GTD · inventory skew |
-| 10 | ⚡ **On-Chain Whale Signal** | 3–30s ahead of the public positions API | Polygon block sub · ABI calldata decode |
+> 📦 **Per-venue configs and walkthroughs live in each market's dedicated repo** — see [Venue Coverage](#venue-coverage). Every bot runs on the shared engine and [safety layer](#safety), with full dry-run support.
+
+| # | Strategy | Status | Edge in one line | Key spec |
+|---|----------|:---:|------------------|----------|
+| 1 | 🎯 **Copy Trading** | ✅ **Production** | Mirror wallets that already proved they have alpha | Multi-wallet · FAK/GTD · circuit breaker |
+| 2 | ⚡ **BTC 5m / 15m / 1hr Arbitrage** | 🚧 In development | Speed on short-window BTC Up/Down | FAK · short-window |
+| 3 | 💰 **Cross-Market Arbitrage** | 🚧 In development | Lock the spread, not the direction | Polymarket ↔ Kalshi ↔ PredictIt · hedged legs |
+| 4 | 🎯 **Directional Arbitrage** | 🚧 In development | Arb base (Up + Down < $1), then tilt toward the side with more edge | Hedged base · limit-only |
+| 5 | 📈 **Spread Farming** | 🚧 In development | A thousand 0.5¢ wins compound into one number | Bid-ask capture · per-trade P&L |
+| 6 | 🏆 **Sports Execution** | 🚧 In development | Click. Filled. Done | NBA / NFL / Soccer · FAK |
+| 7 | 🎯 **Resolution Sniper** | 🚧 In development | 95¢ near-certainty → guaranteed $1.00 payout | Certainty scan · hold to resolution |
+| 8 | 📊 **Orderbook Imbalance** | 🚧 In development | The signal *is* the order book — no external feeds | Live OBI · 500ms refresh |
+| 9 | 💰 **Market Making** | 🚧 In development | Be the house, not the gambler | Two-sided GTD · inventory skew |
+| 10 | ⚡ **On-Chain Whale Signal** | 🚧 In development | Ahead of the public positions API | Polygon block sub · ABI calldata decode |
 
 <details>
 <summary><b>How the flagship edges actually work</b> (click to expand)</summary>
 
 <br/>
 
-**🎯 Copy Trading —** Point the bot at one or more wallets with a proven on-chain record. It mirrors their fills at your chosen scale, with per-wallet caps, FAK/GTD order types, and a circuit breaker that halts on abnormal bursts. Pair it with the [on-chain leaderboard](#-managed--copy-trading--early-access) to pick who to follow.
+**🎯 Copy Trading —** Point the bot at one or more wallets with a proven on-chain record. It mirrors their fills at your chosen scale, with per-wallet caps, FAK/GTD order types, and a circuit breaker that halts on abnormal bursts. Pick who to follow from any wallet with a verifiable on-chain record.
 
 **💰 Cross-Market Arbitrage —** The same real-world question is often listed on Polymarket, Kalshi *and* PredictIt at slightly different prices. The engine matches the same contract across venues (strict matching — no fuzzy false pairs), and captures the gap **only when it beats round-trip fees**. Cross-listed markets are mostly efficient, so this is a patience game: it waits for a real dislocation instead of forcing trades.
 
@@ -138,34 +153,15 @@ A complete suite of ten production-grade trading bots, each engineered around a 
 
 ---
 
-## 💼 Managed & Copy-Trading — Early Access
+## 💼 Managed & Copy-Trading — Currently Closed
 
-**Don't want to run infrastructure?** Trade the same engine as a service. Open a managed account, pick a proven leader or a strategy, and let the hosted bots run — you watch balance, P&L, and fees update on a live dashboard.
+> ⏸️ **The hosted service is not currently open.** It ran as a paper-trading beta — simulated funds, no real custody — and is offline while the infrastructure moves. It never handled real money, and live trading was always gated behind custody, security audit and licensing. **Sign-ups and pricing are closed for now**, so the way to use this project today is to run it yourself with your own keys (see [Run the bots yourself](#-run-the-bots-yourself)).
 
-> 🧪 **Status: early-access beta — paper trading (simulated funds).** You can explore the full product, the leaderboard, and the economics today with zero capital at risk. **Managed *live* trading with real funds is gated behind the waitlist** and is not open yet — custody, security audit, and licensing come first. We will not touch real money before that's done.
-
-### What you get
-
-| | |
-|---|---|
-| 📈 **On-chain leaderboard** | Real Polymarket wallets ranked by verifiable **on-chain P&L** (profit or volume, 1d/7d/30d/all-time). One click to copy a proven trader. |
-| 🤖 **Hosted strategy bots** | The same 10-strategy engine, run for you. No keys, no servers, no ops. |
-| 💰 **Cross-venue arbitrage** | Live pricing across **Polymarket ↔ Kalshi ↔ PredictIt**, with Manifold as a play-money consensus signal. |
-| 🛡️ **Same safety layer** | Circuit breaker, depth guard, trade floor — the guardrails from the open-source engine, applied to every managed account. |
-
-### Early-access plans
-
-| Plan | Price | Performance fee | Best for |
-|---|---|---|---|
-| 🆓 **Starter** | Free | — | Learn the bots in **paper mode**, zero risk |
-| 🔥 **Pro** | \$49 / mo | 10% (high-water mark) | Self-directed traders who want hosted bots + more strategies |
-| 💎 **Managed** | \$199 / mo | 20% (high-water mark) | Full copy-trading across all strategies, hands-off |
-
-*Performance fees use a **high-water mark** — you're only charged on new profit above your prior peak, never on your own deposits or on recovering a drawdown. Pricing shown is early-access and paper-beta.*
+If you want to talk about a managed setup when it reopens — or about running the engine at size yourself — that conversation happens on Telegram:
 
 <div align="center">
 
-[![Join the waitlist](https://img.shields.io/badge/🚀_Join_the_Early--Access_Waitlist-Telegram-229ED9?style=for-the-badge&logo=telegram&logoColor=white)](https://t.me/HarrierOnChain)
+[![Talk on Telegram](https://img.shields.io/badge/Discuss_the_bots-Telegram-229ED9?style=for-the-badge&logo=telegram&logoColor=white)](https://t.me/HarrierOnChain)
 
 </div>
 
@@ -265,7 +261,7 @@ The circuit breaker fires when consecutive large trades exceed the configured th
 
 ## Contact
 
-Built and maintained actively. Whether you want to **run the bots**, **join the managed early-access waitlist**, request a **new venue adapter**, or just talk Polymarket tooling and algorithmic strategies — reach out.
+Built and maintained actively. Whether you want to **run the bots**, request a **new venue adapter**, or just talk Polymarket tooling and algorithmic strategies — reach out.
 
 <div align="center">
 
@@ -284,7 +280,7 @@ Built and maintained actively. Whether you want to **run the bots**, **join the 
 
 ## Disclaimer
 
-> Trading prediction markets involves real financial risk. This software is provided as-is, without warranty or guarantee of any outcome. It is not financial advice. Always test with `enable_trading: false` before deploying real capital. The **managed / copy-trading service is in early-access beta and operates in paper mode (simulated funds)** — it does not custody real money, and any live-trading rollout will follow proper custody, audit, and licensing. Ensure compliance with each venue's terms of service and applicable regulations in your jurisdiction.
+> Trading prediction markets involves real financial risk. This software is provided as-is, without warranty or guarantee of any outcome. It is not financial advice. Always test with `enable_trading: false` before deploying real capital. Only **Copy Trading** is production-ready; the other nine strategies are marked 🚧 in the source and are not ready to trade. The **managed / copy-trading service is currently closed** — it ran in paper mode (simulated funds), never custodied real money, and any future live-trading rollout will follow proper custody, audit, and licensing. Ensure compliance with each venue's terms of service and applicable regulations in your jurisdiction.
 
 ---
 
