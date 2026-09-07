@@ -57,18 +57,18 @@ Prefer to build it? `cargo install --git https://github.com/HarrierOnChain/Predi
 Open-source engine, your keys, your wallet.
 
 ```bash
-# 1. Grab a venue repo (Polymarket shown)
-git clone https://github.com/HarrierOnChain/Polymarket
-cd Polymarket
+# 1. Clone the engine (the trading code lives here)
+git clone https://github.com/HarrierOnChain/Prediction-Markets-Trading-Bot-Toolkits
+cd Prediction-Markets-Trading-Bot-Toolkits
 
-# 2. Configure — copy the example
-cp config.example.yaml config.yaml
+# 2. Configure — credentials from the example
+cp config.yaml.example config.yaml
 
 # 3. Dry-run first (no real orders)
 cargo run --release -- run copy-trading
 ```
 
-Every bot ships with `enable_trading: false` by default — the full execution path runs in dry-run until *you* flip it. Per-venue configs and walkthroughs live in each [venue repo](#venue-coverage).
+Every bot ships with `enable_trading: false` by default — the full execution path runs in dry-run until *you* flip it. The [per-venue repos](#venue-coverage) currently hold venue metadata, not a working bot; clone this one.
 
 </td>
 <td width="50%" valign="top">
@@ -116,7 +116,7 @@ Ten strategies, one execution core. **Copy Trading is production-ready and is wh
 
 What *is* built is the layer underneath all of them: a Polymarket CLOB client, an order executor with EIP-712 signing and a real dry-run path, a risk guard, position monitor and store, market cache, and on-chain ingestion off Polygon logs. That engine is what Copy Trading runs on today, and what each remaining strategy plugs into as it lands.
 
-> 📦 **Per-venue configs and walkthroughs live in each market's dedicated repo** — see [Venue Coverage](#venue-coverage). Every bot runs on the shared engine and [safety layer](#safety), with full dry-run support.
+> 📦 Every bot runs on the shared engine and [safety layer](#safety), with full dry-run support. The [per-venue repos](#venue-coverage) hold venue metadata — the trading code is here.
 
 | # | Strategy | Status | Edge in one line | Key spec |
 |---|----------|:---:|------------------|----------|
@@ -172,54 +172,57 @@ If you want to talk about a managed setup when it reopens — or about running t
 
 ## Venue Coverage
 
-The engine is venue-agnostic: any platform exposing an order book or position
-feed plugs in through a single adapter. Seven venues are **live in production**;
-the rest of the prediction-market landscape is on the adapter-driven roadmap.
+The engine is venue-agnostic **by design**: any platform exposing an order book or
+position feed plugs in through a single adapter, so adding a market means writing
+one adapter rather than rebuilding a bot.
 
-**Legend:** 🟢 Live · 🟡 Beta (adapter in testing) · ⚪ Roadmap (adapter-driven)
+**Today exactly one adapter is implemented — Polymarket.** It's the only venue the
+binary is configured to reach (`clob.polymarket.com`, `gamma-api.polymarket.com`,
+`data-api.polymarket.com`, plus Polygon RPC for on-chain ingestion). Everything
+below it is roadmap.
 
-> 🟡 **Beta = live, verified price data wired into the cross-venue arbitrage engine;
-> full strategy execution still in testing.** PredictIt (real-money) and Manifold
-> (play-money consensus signal) now feed live prices alongside Polymarket and Kalshi.
+Each venue has a repo of its own, but those currently hold **venue metadata** —
+name, type, and the strategies planned for it — not a working bot. The trading
+code lives here, in the shared engine.
 
-### 🟢 Live today
+### ✅ Implemented
 
-| Venue | Type | Strategies running |
+| Venue | Type | Strategies |
 |---|---|---|
-| [**Polymarket**](https://github.com/HarrierOnChain/Polymarket) | Decentralized (Polygon / USDC) | All 10 — full coverage |
-| [**Kalshi**](https://github.com/HarrierOnChain/Kalshi) | CFTC-regulated (US) | Cross-arb · Resolution Sniper · OBI · Market Making · Directional Arb · Spread · Sports |
+| [**Polymarket**](https://github.com/HarrierOnChain/Polymarket) | Decentralized (Polygon / USDC) | **Copy Trading** (production). The other nine strategies are 🚧 in development — see [Strategies](#strategies). |
+
+### ⚪ Roadmap — Traditional / Regulated
+
+| Venue | Type | Planned strategies |
+|---|---|---|
+| [**Kalshi**](https://github.com/HarrierOnChain/Kalshi) | CFTC-regulated (US) | Cross-Venue Arb · Resolution Sniper · OBI · Market Making |
+| [**PredictIt**](https://github.com/HarrierOnChain/PredictIt) | Academic / US politics | Cross-Venue Arb · Resolution Sniper |
+| [**Robinhood Predictions**](https://github.com/HarrierOnChain/Robinhood-Predictions) | Brokerage-integrated | Directional Arb · Sports |
+| [**Crypto.com Predictions**](https://github.com/HarrierOnChain/Crypto.com-Predictions) | Crypto-integrated | BTC Arb · Directional Arb |
+| [**OG.com**](https://github.com/HarrierOnChain/OG.com) | Social / multi-outcome | Sports · OBI · Market Making |
+| [**DraftKings Predictions**](https://github.com/HarrierOnChain/DraftKings-Predictions) | Sports | Sports Execution |
+| [**FanDuel Predicts**](https://github.com/HarrierOnChain/FanDuel-Predicts) | Sports | Sports Execution |
+| [**Fanatics Markets**](https://github.com/HarrierOnChain/Fanatics-Markets) | Sports / entertainment | Sports Execution |
+| [**Interactive Brokers ForecastTrader**](https://github.com/HarrierOnChain/Interactive-Brokers-ForecastTrader) | Financial events | Resolution Sniper · Spread · Market Making |
+
+### ⚪ Roadmap — Crypto / Decentralized
+
+| Venue | Chain / Type | Planned strategies |
+|---|---|---|
 | [**Limitless**](https://github.com/HarrierOnChain/Limitless-Exchange) | On-chain order book | Resolution Sniper · OBI · Spread Farming |
 | [**Drift BET**](https://github.com/HarrierOnChain/Drift-BET) | Solana | BTC Arb · OBI · Market Making · Whale Signal |
-| [**Augur**](https://github.com/HarrierOnChain/Augur) | Ethereum | Resolution Sniper · OBI |
 | [**Azuro**](https://github.com/HarrierOnChain/Azuro) | Decentralized protocol | Sports · OBI |
+| [**Augur**](https://github.com/HarrierOnChain/Augur) | Ethereum | Resolution Sniper · OBI |
 | [**Myriad Markets**](https://github.com/HarrierOnChain/Myriad-Markets) | Crypto | OBI · Directional Arb |
-
-### Traditional / Regulated
-
-| Venue | Type | Status | Best-fit strategies |
-|---|---|---|---|
-| [**Robinhood Predictions**](https://github.com/HarrierOnChain/Robinhood-Predictions) | Brokerage-integrated | ⚪ Roadmap | Directional Arb · Sports |
-| [**Crypto.com Predictions**](https://github.com/HarrierOnChain/Crypto.com-Predictions) | Crypto-integrated | ⚪ Roadmap | BTC Arb · Directional Arb |
-| [**OG.com**](https://github.com/HarrierOnChain/OG.com) | Social / multi-outcome | ⚪ Roadmap | Sports · OBI · Market Making |
-| [**DraftKings Predictions**](https://github.com/HarrierOnChain/DraftKings-Predictions) | Sports | ⚪ Roadmap | Sports Execution |
-| [**FanDuel Predicts**](https://github.com/HarrierOnChain/FanDuel-Predicts) | Sports | ⚪ Roadmap | Sports Execution |
-| [**Fanatics Markets**](https://github.com/HarrierOnChain/Fanatics-Markets) | Sports / entertainment | ⚪ Roadmap | Sports Execution |
-| [**Interactive Brokers ForecastTrader**](https://github.com/HarrierOnChain/Interactive-Brokers-ForecastTrader) | Financial events | ⚪ Roadmap | Resolution Sniper · Spread · Market Making |
-| [**PredictIt**](https://github.com/HarrierOnChain/PredictIt) | Academic / US politics | 🟡 Beta | **Cross-Venue Arb — live price data** · Resolution Sniper (research-only, bet caps) |
-
-### Crypto / Decentralized
-
-| Venue | Chain / Type | Status | Best-fit strategies |
-|---|---|---|---|
-| [**Hedgehog Markets**](https://github.com/HarrierOnChain/Hedgehog-Markets) | Solana / social | ⚪ Roadmap | Copy Trading · Directional Arb |
-| [**Zeitgeist**](https://github.com/HarrierOnChain/Zeitgeist) | Polkadot | ⚪ Roadmap | OBI · Market Making |
-| [**Projection Finance**](https://github.com/HarrierOnChain/Projection-Finance) | Volatility / sims | ⚪ Roadmap | Directional Arb · Spread |
-| [**Better Fan**](https://github.com/HarrierOnChain/Better-Fan) | Sports / esports | ⚪ Roadmap | Sports Execution |
-| [**Manifold Markets**](https://github.com/HarrierOnChain/Manifold-Markets) | Play-money | 🟡 Beta | **Consensus signal — live probability feed** · Directional Arb backtest |
+| [**Hedgehog Markets**](https://github.com/HarrierOnChain/Hedgehog-Markets) | Solana / social | Copy Trading · Directional Arb |
+| [**Zeitgeist**](https://github.com/HarrierOnChain/Zeitgeist) | Polkadot | OBI · Market Making |
+| [**Projection Finance**](https://github.com/HarrierOnChain/Projection-Finance) | Volatility / sims | Directional Arb · Spread |
+| [**Better Fan**](https://github.com/HarrierOnChain/Better-Fan) | Sports / esports | Sports Execution |
+| [**Manifold Markets**](https://github.com/HarrierOnChain/Manifold-Markets) | Play-money · consensus signal | Directional Arb (signal only) |
 
 > **Want a venue prioritized?** Adapter work is demand-driven — if you trade a
-> platform not yet live, [reach out on Telegram](https://t.me/HarrierOnChain) and it can move
-> up the queue.
+> platform that isn't implemented yet, [reach out on Telegram](https://t.me/HarrierOnChain)
+> and it can move up the queue.
 
 ---
 
