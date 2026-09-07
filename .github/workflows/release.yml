@@ -1,0 +1,137 @@
+name: Release
+
+# Cut a release by pushing a tag:
+#   git tag v0.1.0 && git push origin v0.1.0
+# Builds a binary for each platform, attaches it with a SHA256 checksum, and
+# publishes the GitHub Release. Can also be run manually from the Actions tab
+# against an existing tag.
+on:
+  push:
+    tags: ["v*"]
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: "Existing tag to build (e.g. v0.1.0)"
+        required: true
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    name: ${{ matrix.target }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: ubuntu-latest
+            target: x86_64-unknown-linux-gnu
+          - os: ubuntu-latest
+            target: aarch64-unknown-linux-gnu
+          - os: macos-latest
+            target: x86_64-apple-darwin
+          - os: macos-latest
+            target: aarch64-apple-darwin
+          - os: windows-latest
+            target: x86_64-pc-windows-msvc
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.inputs.tag || github.ref }}
+
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: ${{ matrix.target }}
+
+      - uses: Swatinem/rust-cache@v2
+        with:
+          key: ${{ matrix.target }}
+
+      # aarch64 Linux needs a cross linker; the other targets build natively.
+      - name: Install aarch64 linker
+        if: matrix.target == 'aarch64-unknown-linux-gnu'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y gcc-aarch64-linux-gnu
+          echo "CARGO_TARGET_AARCH64_UNKNOWN_LINUX_GNU_LINKER=aarch64-linux-gnu-gcc" >> "$GITHUB_ENV"
+
+      - name: Build
+        run: cargo build --release --target ${{ matrix.target }}
+
+      - name: Package (unix)
+        if: matrix.os != 'windows-latest'
+        shell: bash
+        run: |
+          BIN=polymarket-toolkits
+          NAME="${BIN}-${{ github.event.inputs.tag || github.ref_name }}-${{ matrix.target }}"
+          mkdir -p "dist/$NAME"
+          cp "target/${{ matrix.target }}/release/$BIN" "dist/$NAME/"
+          cp README.md LICENSE config.yaml.example "dist/$NAME/" 2>/dev/null || true
+          tar -czf "dist/$NAME.tar.gz" -C dist "$NAME"
+          shasum -a 256 "dist/$NAME.tar.gz" | awk '{print $1"  '"$NAME"'.tar.gz"}' > "dist/$NAME.tar.gz.sha256"
+
+      - name: Package (windows)
+        if: matrix.os == 'windows-latest'
+        shell: bash
+        run: |
+          BIN=polymarket-toolkits
+          NAME="${BIN}-${{ github.event.inputs.tag || github.ref_name }}-${{ matrix.target }}"
+          mkdir -p "dist/$NAME"
+          cp "target/${{ matrix.target }}/release/$BIN.exe" "dist/$NAME/"
+          cp README.md LICENSE config.yaml.example "dist/$NAME/" 2>/dev/null || true
+          (cd dist && 7z a -tzip "$NAME.zip" "$NAME" >/dev/null)
+          (cd dist && certutil -hashfile "$NAME.zip" SHA256 | sed -n 2p | tr -d ' \r' | awk '{print $1"  '"$NAME"'.zip"}' > "$NAME.zip.sha256")
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: ${{ matrix.target }}
+          path: |
+            dist/*.tar.gz
+            dist/*.zip
+            dist/*.sha256
+          if-no-files-found: error
+
+  publish:
+    name: Publish release
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          path: artifacts
+          merge-multiple: true
+
+      - name: List artifacts
+        run: ls -lh artifacts
+
+      - uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ github.event.inputs.tag || github.ref_name }}
+          draft: true
+          generate_release_notes: true
+          files: artifacts/*
+          body: |
+            ## Install
+
+            Download the archive for your platform below, verify the checksum, and extract:
+
+            ```bash
+            tar -xzf polymarket-toolkits-<tag>-<target>.tar.gz
+            cd polymarket-toolkits-<tag>-<target>
+            cp config.yaml.example config.yaml
+            ./polymarket-toolkits run copy-trading
+            ```
+
+            Or build from source: `cargo install --git https://github.com/HarrierOnChain/Prediction-Markets-Trading-Bot-Toolkits`
+
+            ## Before you trade
+
+            Every bot ships with `enable_trading: false`. The full execution path —
+            including EIP-712 order signing — runs in dry-run until you flip it
+            yourself. Leave it off until you've watched a session end to end.
+
+            **Only Copy Trading is production-ready.** The other nine strategies are
+            scaffolded on the shared engine and marked 🚧 in the source; they start
+            and log, but do not place orders yet.
